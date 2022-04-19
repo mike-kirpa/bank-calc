@@ -1,0 +1,19 @@
+{{ define "show"}}
+
+{{ template "header"}}
+<main role="main" class="inner cover">
+    <h1 class="cover-heading">Bank name: {{ .BankName }}</h1>
+    <p class="lead">Interest rate: {{ .InterestRate }}</p>
+    <p class="lead">Interest rate: {{ .MaximumLoan }}</p>
+    <p class="lead">Interest rate: {{ .MinimumDownPayment }}</p>
+    <p class="lead">Interest rate: {{ .MinimumDownPayment }}</p>
+
+
+    <form action="/delete" method="POST" name="xdel">
+        <input type="hidden" name="bankId" value="{{ .Id }}">
+        <a href="/" class="btn btn-lg btn-secondary">Back</a>
+        <button type="delete" id="xbutton" class="btn btn-lg btn-secondary">Delete</button>
+    </form>    </p>
+</main>
+{{ template "footer"}}
+{{ end }}
