@@ -11,3 +11,5 @@ INSERT INTO banks (`bank_name`, `interest_rate`, `maximum_loan`, `minimum_down_p
 VALUES ('trust bank', 10, 10000, 1000, 365);
 
 DELETE FROM banks WHERE id = 1;
+
+UPDATE banks SET `bank_name`='qqq', `interest_rate`='11', `maximum_loan`='11111', `minimum_down_payment`='3333', `loan_term`='555' WHERE `id`='4'

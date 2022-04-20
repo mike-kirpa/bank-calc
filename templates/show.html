@@ -12,6 +12,7 @@
     <form action="/delete" method="POST" name="xdel">
         <input type="hidden" name="bankId" value="{{ .Id }}">
         <a href="/" class="btn btn-lg btn-secondary">Back</a>
+        <a href="/edit/{{ .Id }}" class="btn btn-lg btn-secondary">Edit</a>
         <button type="delete" id="xbutton" class="btn btn-lg btn-secondary">Delete</button>
     </form>    </p>
 </main>

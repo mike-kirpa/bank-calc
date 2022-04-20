@@ -1,0 +1,18 @@
+{{ define "edit"}}
+
+{{ template "header"}}
+<main role="main" class="inner cover">
+
+    <form method="post" action="/update">
+        <input type="hidden" name="id" value={{ .Id }} />
+        Bank name: <input type="text" name="name" id="name" placeholder="Bank's name" class="form-control" value= {{ .BankName }}><br>
+        Interest rate: <input type="text" name="interest_rate" id="interest_rate" class="form-control" placeholder="Input interest rate" value= {{ .InterestRate }}></textarea><br>
+        Maximum loan: <input type="text" name="maximum_loan" id="maximum_loan" class="form-control" placeholder="Input maximum loan" value= {{ .MaximumLoan }}></textarea><br>
+        Minimum down payment: <input type="text" name="minimum_down_payment" id="minimum_down_payment" class="form-control" placeholder="Input minimum down payment" value= {{ .MinimumDownPayment }}></textarea><br>
+        Loan term: <input type="text" name="loan_term" id="loan_term" class="form-control" placeholder="Input loan term" value= {{ .LoanTerm }}></textarea><br>
+        <input type="submit" value="Update"/>
+    </form>
+
+</main>
+{{ template "footer"}}
+{{ end }}

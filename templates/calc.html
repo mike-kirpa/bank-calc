@@ -1,0 +1,17 @@
+{{ define "calc"}}
+
+{{ template "header"}}
+<main role="main" class="inner cover">
+    <form method="post" action="/result" id="calcform">
+        <input type="number" name="initial_loan" id="initial_loan" placeholder="Initial loan" class="form-control" ><br>
+        <input type="number" name="down_payment" id="down_payment" placeholder="Down payment" class="form-control" ><br>
+        <select id="banks" name="banklist" form="calcform">
+            {{range $key, $value := . }}
+            <option value="{{ $value.Id }}">{{ $value.BankName }}</option>
+            {{end}}
+        </select>
+        <p><p><input type="submit" value="Send"/></p></p>
+    </form>
+</main>
+{{ template "footer"}}
+{{ end }}
