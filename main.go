@@ -7,14 +7,16 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/heroku/x/hmetrics/onload"
 	"log"
+	"math"
 	"net/http"
+	"strconv"
 	"text/template"
 )
 
 type Bank struct {
 	Id                 uint64
 	BankName           string
-	InterestRate       float32
+	InterestRate       float64
 	MaximumLoan        uint64
 	MinimumDownPayment uint64
 	LoanTerm           uint64
@@ -29,6 +31,7 @@ func main() {
 	rtr.HandleFunc("/edit/{id:[0-9]+}", editBank).Methods("GET")
 	rtr.HandleFunc("/update", updateBank).Methods("POST")
 	rtr.HandleFunc("/delete", deleteBank).Methods("POST")
+	rtr.HandleFunc("/result", result).Methods("POST")
 	rtr.HandleFunc("/calc", calc).Methods("GET")
 	http.Handle("/", rtr)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -250,4 +253,54 @@ func calc(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func result(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/result.html", "templates/header.html", "templates/footer.html")
+	if err != nil {
+		fmt.Fprint(w, err.Error())
+	}
+
+	id := r.FormValue("banklist")
+	initialLoanS := r.FormValue("initial_loan")
+	downPaymentS := r.FormValue("down_payment")
+	initialLoan, err := strconv.ParseUint(initialLoanS, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	downPayment, err := strconv.ParseUint(downPaymentS, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := sql.Open("mysql", "root:test@tcp(127.0.0.1:3310)/rest_api")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	res, err := db.Query(fmt.Sprintf("SELECT * FROM `banks` WHERE `id` = '%s'", id))
+	if err != nil {
+		panic(err)
+	}
+	bank := Bank{}
+	for res.Next() {
+		var b Bank
+		err := res.Scan(&b.Id, &b.BankName, &b.InterestRate, &b.MaximumLoan, &b.MinimumDownPayment, &b.LoanTerm)
+		if err != nil {
+			panic(err)
+		}
+		bank = b
+	}
+	var result string
+	if initialLoan > bank.MaximumLoan {
+		result = fmt.Sprintf("you want to receive: $%d, but the bank can issue the maximum amount: $%d", initialLoan, bank.MaximumLoan)
+	} else if downPayment < bank.MinimumDownPayment {
+		result = fmt.Sprintf("you want to deposit the initial amount: $%d, but the bank needs more: $%d", downPayment, bank.MinimumDownPayment)
+	} else {
+		r := (float64(initialLoan-downPayment) * (bank.InterestRate / (12 * 100)) * math.Pow(1+bank.InterestRate/(12*100), float64(bank.LoanTerm))) / (math.Pow(1+bank.InterestRate/(12*100), float64(bank.LoanTerm)) - 1)
+		result = fmt.Sprintf("your monthly payment is: $%.2f", r)
+	}
+
+	t.ExecuteTemplate(w, "result", result)
 }
