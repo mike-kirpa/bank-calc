@@ -236,11 +236,10 @@ func deleteBank(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	res, err := db.Query(fmt.Sprintf("DELETE FROM `banks` WHERE `id` = '%s'", bankId))
+	_, err = db.Exec("DELETE FROM banks WHERE id = $1", bankId)
 	if err != nil {
 		panic(err)
 	}
-	defer res.Close()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -294,12 +293,11 @@ func updateBank(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	update, err := db.Query(fmt.Sprintf("UPDATE `banks` SET `bank_name`='%s', `interest_rate`='%s', `maximum_loan`='%s', `minimum_down_payment`='%s', `loan_term`='%s' WHERE `id`='%s'",
-		name, interestRate, maximumLoan, minimumDownPayment, loanTerm, id))
+	_, err = db.Exec("UPDATE banks SET bank_name=$1, interest_rate=$2, maximum_loan=$3, minimum_down_payment=$4, loan_term=$5 WHERE id=$6",
+		name, interestRate, maximumLoan, minimumDownPayment, loanTerm, id)
 	if err != nil {
 		panic(err)
 	}
-	defer update.Close()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
